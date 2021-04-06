@@ -1,3 +1,5 @@
+import numpy as np
+
 class Move:
 
 	def __init__(self, cell: int):
@@ -22,6 +24,8 @@ class Board:
 		A11,B11,C11,D11,E11,F11,G11,H11,I11,J11,K11
 	] = range(121)
 
+	LINE_LEN = 11
+
 	def __init__(self):
 		self.stack_moves = []
 		self.board_state = [None] * 121
@@ -32,6 +36,11 @@ class Board:
 
 	def __str__(self):
 		return self.print_board()
+
+	def neighbors(self, cell: int):
+		all_neighbors = np.array([cell - self.LINE_LEN, cell - self.LINE_LEN + 1, cell -1, cell + 1, cell + self.LINE_LEN - 1, cell + self.LINE_LEN])
+		return all_neighbors[(all_neighbors >= 0 ) & (all_neighbors < 121)]
+
 
 	def is_legal(self, move: Move) -> bool:
 		"""
@@ -49,10 +58,10 @@ class Board:
 				moves.append(index)
 		return moves
 
-	def push(self, move: Move):         
+	def push(self, move: Move):
 		"""
 			Play a move on the board.
-		"""             
+		"""
 		if not self.is_legal(move):
 			raise Exception("Trying to push an illegal move.")
 
@@ -75,17 +84,43 @@ class Board:
 		return self.is_white_winner() or self.is_black_winner()
 
 	def is_white_winner(self):
-		"""
-			Return a boolean value, true if white won the game.
-		"""
-		print("to be defined")
-
+		open_list = []
+		closed_list = []
+		for i in range(0, self.LINE_LEN):
+			if(self.board_state[i] == self.WHITE ):
+				open_list.append(i)
+		while(len(open_list) > 0):
+			cur_cell = open_list[0]
+			if(cur_cell >= 110):
+				return True
+			neighbors = self.neighbors(cur_cell)
+			for i in neighbors:
+				if (self.board_state[i] == self.WHITE and
+				i not in closed_list and i not in open_list):
+					open_list.append(i)
+			closed_list.append(cur_cell)
+			open_list.pop(0)
+		return False
 
 	def is_black_winner(self):
-		"""
-			Return a boolean value, true if black won the game.
-		"""
-		print("to be defined")
+		open_list = []
+		closed_list = []
+		for i in range(0, 121, 10):
+			if(self.board_state[i] == self.BLACK ):
+				open_list.append(i)
+		while(len(open_list) > 0):
+			cur_cell = open_list[0]
+			if((cur_cell % 11) == 0):
+				return True
+			neighbors = self.neighbors(cur_cell)
+			for i in neighbors:
+				if (self.board_state[i] == self.BLACK and
+				 i not in closed_list and i not in open_list):
+					open_list.append(i)
+			closed_list.append(cur_cell)
+			open_list.pop(0)
+		return False
+
 
 
 	def print_board(self):
