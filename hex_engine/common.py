@@ -5,13 +5,13 @@ from math import inf
 def board_evaluation(board: hex.Board):
 	""""
 		Return the substraction between blue and red score.
-		If the heuristic evaluation return a positive value, red player has
-		an advantage on the board, else blue has an advantage.
+		If the heuristic evaluation return a positive value, blue player has
+		an advantage on the board, else red has an advantage.
 	"""
 	return get_score(board, board.BLUE) - get_score(board, board.RED)
 
 
-def get_score(board: hex.Board, color: bool):
+def get_score(board: hex.Board, color: bool) -> int:
 	"""
 		The score of a side on the board is calculated by the minimum amount of hex
 		needed to finish the game with the dijkstra algorithm.
@@ -22,10 +22,8 @@ def get_score(board: hex.Board, color: bool):
 	# Initialisation
 	visited = []
 	values = []
-	prdcssrs = []
 	for _ in range(len(hex.Board.CELLS)):
 		values.append(inf)
-		prdcssrs.append(-1)
 	values[hex.Board.A1] = 0
 
 	# Tant qu'il existe un sommet non visité
@@ -33,7 +31,7 @@ def get_score(board: hex.Board, color: bool):
 		# On choisit un sommet pas encore visité minimal
 		curr = find_lowest(visited, values)
 		visited.append(curr)
-		# Pour chaque voisin de current hors de visited
+		# Pour chaque voisin de current hors de visited et différent de la couleur opposée
 		for h in hex.neighbors(curr):
 			# print (curr, hex.neighbors(curr))
 			if h not in visited:
@@ -44,18 +42,10 @@ def get_score(board: hex.Board, color: bool):
 					board.hex_color(h),
 					color
 				)
-				print(values[h], values[curr], weight)
 				if values[h] > (values[curr] + weight) and weight != inf:
 					values[h] = values[curr] + weight
-					prdcssrs[h] = curr
-	# L'algorithme est fini, on parcours prédécessuer pour trouver 
-	# la taille du chemin
-	end = hex.Board.K11
-	# print(values[end])
-	# while end != hex.Board.A1:
-	# 	end = prdcssrs[end]
-	# 	print(end)
-	return values
+	print(values)
+	return values[hex.Board.K11]
 
 
 def find_lowest(visited, values):
@@ -79,9 +69,6 @@ def transition_value(hex1: int, color1: bool, hex2: int, color2: bool, side: boo
 
 		Return inf if the transition is not possible.
 	"""
-	if (color1 != None and color2 != side 
-			or color2 != None and color1 != side):
-		return inf
 
 	if color1 == color2 and color1 != None:
 		return 0
@@ -109,5 +96,8 @@ def transition_value(hex1: int, color1: bool, hex2: int, color2: bool, side: boo
 			and hex2 >= hex.Board.A11
 			and side == hex.Board.RED):
 		return 0
+
+	if color1 == (not side) or color2 == (not side):
+		return 1000
 
 	return 1

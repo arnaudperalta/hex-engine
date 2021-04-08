@@ -89,9 +89,9 @@ class Board:
 		open_list = []
 		closed_list = []
 		for i in range(0, self.LINE_LEN):
-			if(self.board_state[i] == self.RED ):
+			if self.board_state[i] == self.RED:
 				open_list.append(i)
-		while(len(open_list) > 0):
+		while len(open_list) > 0 :
 			cur_cell = open_list[0]
 			if cur_cell >= 110:
 				return True
