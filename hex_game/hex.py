@@ -1,3 +1,4 @@
+from hex_render import svg_render
 import numpy as np
 
 class Move:
@@ -8,7 +9,7 @@ class Move:
 
 class Board:
 
-	COLORS = [WHITE, BLACK] = [True, False]
+	COLORS = [BLUE, RED] = [True, False]
 
 	CELLS = [
 		A1, B1, C1, D1, E1, F1, G1, H1, I1, J1, K1,
@@ -29,18 +30,16 @@ class Board:
 	def __init__(self):
 		self.stack_moves = []
 		self.board_state = [None] * 121
-		self.turn = self.WHITE
+		self.turn = self.RED
 
 	def __repr__(self):
-		print("call SVG representation")
+		svg_render.display_board()
+		for cell in self.board_state:
+			svg_render.display_cell(cell, None)
+		return ""
 
 	def __str__(self):
 		return self.print_board()
-
-	def neighbors(self, cell: int):
-		all_neighbors = np.array([cell - self.LINE_LEN, cell - self.LINE_LEN + 1, cell -1, cell + 1, cell + self.LINE_LEN - 1, cell + self.LINE_LEN])
-		return all_neighbors[(all_neighbors >= 0 ) & (all_neighbors < 121)]
-
 
 	def is_legal(self, move: Move) -> bool:
 		"""
@@ -63,7 +62,7 @@ class Board:
 			Play a move on the board.
 		"""
 		if not self.is_legal(move):
-			raise Exception("Trying to push an illegal move.")
+			raise InvalidMoveError("Trying to push an illegal move.")
 
 		self.stack_moves.append(move)
 		self.board_state[move.cell] = self.turn
@@ -77,69 +76,100 @@ class Board:
 		self.board_state[move.cell] = None
 		self.turn = not self.turn
 
-	def is_game_over(self):
+	def is_game_over(self) -> bool:
 		"""
 			Return a boolean value, true if the game is finished.
 		"""
-		return self.is_white_winner() or self.is_black_winner()
+		return self.is_red_winner() or self.is_blue_winner()
 
-	def is_white_winner(self):
+	def is_red_winner(self) -> bool:
+		"""
+			Return true if red won the game on the actual board.
+		"""
 		open_list = []
 		closed_list = []
 		for i in range(0, self.LINE_LEN):
-			if(self.board_state[i] == self.WHITE ):
+			if(self.board_state[i] == self.RED ):
 				open_list.append(i)
 		while(len(open_list) > 0):
 			cur_cell = open_list[0]
-			if(cur_cell >= 110):
+			if cur_cell >= 110:
 				return True
-			neighbors = self.neighbors(cur_cell)
-			for i in neighbors:
-				if (self.board_state[i] == self.WHITE and
+			nghbrs = neighbors(cur_cell)
+			for i in nghbrs:
+				if (self.board_state[i] == self.RED and
 				i not in closed_list and i not in open_list):
 					open_list.append(i)
 			closed_list.append(cur_cell)
 			open_list.pop(0)
 		return False
 
-	def is_black_winner(self):
+	def is_blue_winner(self) -> bool:
+		"""
+			Return true if blue won the game on the actual board.
+		"""
 		open_list = []
 		closed_list = []
 		for i in range(0, 121, 10):
-			if(self.board_state[i] == self.BLACK ):
+			if self.board_state[i] == self.BLUE:
 				open_list.append(i)
-		while(len(open_list) > 0):
+		while len(open_list) > 0:
 			cur_cell = open_list[0]
-			if((cur_cell % 11) == 0):
+			if (cur_cell % self.LINE_LEN) == 0:
 				return True
-			neighbors = self.neighbors(cur_cell)
-			for i in neighbors:
-				if (self.board_state[i] == self.BLACK and
-				 i not in closed_list and i not in open_list):
+			nghbrs = neighbors(cur_cell)
+			for i in nghbrs:
+				if (self.board_state[i] == self.BLUE and
+						i not in closed_list and i not in open_list):
 					open_list.append(i)
 			closed_list.append(cur_cell)
 			open_list.pop(0)
 		return False
-
-
 
 	def print_board(self):
 		"""
 			Print on standard output a board representation of
 			the actual state of the game.
 		"""
-		toPrint = ""
-		lineNb = 0
+		to_print = ""
+		line_nb = 0
 		for i in range(len(self.board_state)):
-			if i != 0 and i % 11 == 0:
-				toPrint += "\n"
-				lineNb += 1
-				for j in range(lineNb):
-					toPrint += "  "
+			if i != 0 and i % self.LINE_LEN == 0:
+				to_print += "\n"
+				line_nb += 1
+				for _ in range(line_nb):
+					to_print += "  "
 			if self.board_state[i] == None:
-				toPrint += ".  "
-			elif self.board_state[i] == self.WHITE:
-				toPrint +=  "w  "
+				to_print += ".  "
+			elif self.board_state[i] == self.RED:
+				to_print +=  "r  "
 			else:
-				toPrint += "b  "
-		return toPrint
+				to_print += "b "
+		return to_print
+
+	def hex_color(self, position: int) -> bool:
+		return self.board_state[position]
+
+
+class InvalidMoveError(Exception):
+	"""
+		Exception class thrown when an illegal move is played.
+	"""
+	pass
+
+def neighbors(cell: int):
+	"""
+		Return an array of position where non empty cells are present around 'cell'
+	"""
+	all_neighbors = np.array(
+		[
+			cell - Board.LINE_LEN,
+			cell - Board.LINE_LEN + 1,
+			cell -1, cell + 1,
+			cell + Board.LINE_LEN - 1,
+			cell + Board.LINE_LEN
+		]
+	)
+	return all_neighbors[
+		(all_neighbors >= 0) & (all_neighbors < 121)
+	]
