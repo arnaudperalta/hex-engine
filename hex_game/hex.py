@@ -102,12 +102,12 @@ class Board:
 		"""
 		open_list = []
 		closed_list = []
-		for i in range(0, 121, 10):
+		for i in range(0, 121, 11):
 			if self.board_state[i] == self.BLUE:
 				open_list.append(i)
 		while len(open_list) > 0:
 			cur_cell = open_list[0]
-			if (cur_cell % self.LINE_LEN) == 0:
+			if ((cur_cell + 1) % self.LINE_LEN) == 0:
 				return True
 			nghbrs = neighbors(cur_cell)
 			for i in nghbrs:
