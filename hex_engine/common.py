@@ -44,7 +44,6 @@ def get_score(board: hex.Board, color: bool) -> int:
 				)
 				if values[h] > (values[curr] + weight) and weight != inf:
 					values[h] = values[curr] + weight
-	print(values)
 	return values[hex.Board.K11]
 
 
@@ -96,6 +95,7 @@ def transition_value(hex1: int, color1: bool, hex2: int, color2: bool, side: boo
 			and hex2 >= hex.Board.A11
 			and side == hex.Board.RED):
 		return 0
+
 
 	if color1 == (not side) or color2 == (not side):
 		return 1000

@@ -1,10 +1,6 @@
+from typing import Iterable, List
 from hex_render import svg_render
 import numpy as np
-
-class Move:
-
-	def __init__(self, cell: int):
-		self.cell = cell
 
 
 class Board:
@@ -30,34 +26,30 @@ class Board:
 	def __init__(self):
 		self.stack_moves = []
 		self.board_state = [None] * 121
-		self.turn = self.RED
-
-	def __repr__(self):
-		svg_render.display_board()
-		for cell in self.board_state:
-			svg_render.display_cell(cell, None)
-		return ""
+		self.turn = self.BLUE
 
 	def __str__(self):
 		return self.print_board()
 
-	def is_legal(self, move: Move) -> bool:
+	def is_legal(self, move: int) -> bool:
 		"""
 			Return a boolean value, is true if the cell is empty.
 		"""
-		return self.board_state[move.cell] is None
+		return self.board_state[move] is None
 
-	def free_cells(self):
+	def free_cells(self) -> List:
 		"""
 			Return all empty cells on the board.
 		"""
 		moves = []
-		for index, cell in self.board_state:
+		index = 0
+		for cell in self.board_state:
 			if cell is None:
 				moves.append(index)
+			index = index + 1
 		return moves
 
-	def push(self, move: Move):
+	def push(self, move: int):
 		"""
 			Play a move on the board.
 		"""
@@ -65,7 +57,7 @@ class Board:
 			raise InvalidMoveError("Trying to push an illegal move.")
 
 		self.stack_moves.append(move)
-		self.board_state[move.cell] = self.turn
+		self.board_state[move] = self.turn
 		self.turn = not self.turn
 
 	def pop(self):
@@ -73,7 +65,7 @@ class Board:
 			Rollback the game from one move.
 		"""
 		move = self.stack_moves.pop()
-		self.board_state[move.cell] = None
+		self.board_state[move] = None
 		self.turn = not self.turn
 
 	def is_game_over(self) -> bool:
@@ -144,7 +136,7 @@ class Board:
 			elif self.board_state[i] == self.RED:
 				to_print +=  "r  "
 			else:
-				to_print += "b "
+				to_print += "b  "
 		return to_print
 
 	def hex_color(self, position: int) -> bool:
@@ -161,15 +153,36 @@ def neighbors(cell: int):
 	"""
 		Return an array of position where non empty cells are present around 'cell'
 	"""
-	all_neighbors = np.array(
-		[
-			cell - Board.LINE_LEN,
-			cell - Board.LINE_LEN + 1,
-			cell -1, cell + 1,
-			cell + Board.LINE_LEN - 1,
-			cell + Board.LINE_LEN
-		]
-	)
+	# Si la case est dans la colonne la plus a gauche
+	if cell % Board.LINE_LEN == 0:
+		all_neighbors = np.array(
+			[
+				cell - Board.LINE_LEN,
+				cell - Board.LINE_LEN + 1,
+				cell + 1,
+				cell + Board.LINE_LEN
+			]
+		)
+	# Si la case est dans la colonne la plus a droite
+	elif cell % Board.LINE_LEN == Board.LINE_LEN - 1:
+		all_neighbors = np.array(
+			[
+				cell - Board.LINE_LEN,
+				cell -1,
+				cell + Board.LINE_LEN - 1,
+				cell + Board.LINE_LEN
+			]
+		)
+	else:
+		all_neighbors = np.array(
+			[
+				cell - Board.LINE_LEN,
+				cell - Board.LINE_LEN + 1,
+				cell -1, cell + 1,
+				cell + Board.LINE_LEN - 1,
+				cell + Board.LINE_LEN
+			]
+		)
 	return all_neighbors[
 		(all_neighbors >= 0) & (all_neighbors < 121)
 	]
