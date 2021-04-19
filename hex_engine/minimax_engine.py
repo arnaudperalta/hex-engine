@@ -2,7 +2,6 @@ from hex_engine.common import board_evaluation
 from hex_game.hex import Board
 from math import inf
 
-
 def get_best_move(board: Board, depth: int, side: bool) -> int:
 	"""
 		Return the estimated best move along the depth

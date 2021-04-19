@@ -1,5 +1,4 @@
 from typing import Iterable, List
-from hex_render import svg_render
 import numpy as np
 
 
@@ -125,18 +124,24 @@ class Board:
 		"""
 		to_print = ""
 		line_nb = 0
+		to_print += "\033[31m  A  B  C  D  E  F  G  H  I  J  K\033[0m\n"
 		for i in range(len(self.board_state)):
+			if i == 0:
+				to_print += "\033[34m1  \033[0m"
 			if i != 0 and i % self.LINE_LEN == 0:
+				to_print += "\033[34m" + str(i // 11) + "  \033[0m"
 				to_print += "\n"
 				line_nb += 1
 				for _ in range(line_nb):
 					to_print += "  "
+				to_print += "\033[34m" + str(i // 11 + 1) + "  \033[0m"
 			if self.board_state[i] == None:
 				to_print += ".  "
 			elif self.board_state[i] == self.RED:
-				to_print +=  "r  "
+				to_print +=  "\033[31mr\033[0m  "
 			else:
-				to_print += "b  "
+				to_print += "\033[34mb\033[0m  "
+		to_print += "\033[34m11\n\033[31m                         A  B  C  D  E  F  G  H  I  J  K\033[0m\n"
 		return to_print
 
 	def hex_color(self, position: int) -> bool:
