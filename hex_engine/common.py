@@ -8,7 +8,7 @@ def board_evaluation(board: hex.Board):
 		If the heuristic evaluation return a positive value, blue player has
 		an advantage on the board, else red has an advantage.
 	"""
-	return get_score(board, board.BLUE) - get_score(board, board.RED)
+	return get_score(board, board.RED) - get_score(board, board.BLUE)
 
 
 def get_score(board: hex.Board, color: bool) -> int:

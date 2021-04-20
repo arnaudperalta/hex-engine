@@ -191,3 +191,20 @@ def neighbors(cell: int):
 	return all_neighbors[
 		(all_neighbors >= 0) & (all_neighbors < 121)
 	]
+
+def parse_move(str_move: str) -> int:
+	str_move = str_move.upper()
+	letter = str_move[0]
+	if not letter.isalpha() or letter > 'K':
+		return -1
+	if len(str_move) == 2:
+		if not str_move[1].isdigit:
+			return -1
+		number = int(str_move[1])
+	elif len(str_move) == 3:
+		if not str_move[1].isdigit or not str_move[2].isdigit:
+			return -1
+		number = int(str_move[1] + str_move[2])
+	else:
+		return -1
+	return (number - 1) * 11 + ord(letter) - ord('A')

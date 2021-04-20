@@ -6,6 +6,8 @@ def get_best_move(board: Board, depth: int, side: bool) -> int:
 	"""
 		Return the estimated best move along the depth
 	"""
+	if board.is_game_over():
+		return -1
 	best_move_value = -inf
 	if side == Board.RED:
 		best_move_value = inf
