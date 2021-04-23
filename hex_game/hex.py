@@ -30,6 +30,13 @@ class Board:
 	def __str__(self):
 		return self.print_board()
 
+	def copy(self):
+		copy = Board()
+		copy.stack_moves = self.stack_moves.copy()
+		copy.board_state = self.board_state.copy()
+		copy.turn = self.turn
+		return copy
+
 	def is_legal(self, move: int) -> bool:
 		"""
 			Return a boolean value, is true if the cell is empty.
@@ -208,3 +215,14 @@ def parse_move(str_move: str) -> int:
 	else:
 		return -1
 	return (number - 1) * 11 + ord(letter) - ord('A')
+
+
+def are_equals(board1: Board, board2: Board) -> bool:
+	if len(board1.stack_moves) != len(board2.stack_moves):
+		return False
+	i = 0
+	for move in board1.stack_moves:
+		if move != board2.stack_moves[i]:
+			return False
+		i = i + 1
+	return True

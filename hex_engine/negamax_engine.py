@@ -21,6 +21,8 @@ def get_best_move(board: Board, depth: int, side: bool) -> int:
 			best_move_value = value
 			best_move = move
 
+	if side == Board.RED:
+			best_move *= -1
 	return best_move
 
 
@@ -30,7 +32,7 @@ def negamax_ab(board: Board, alpha: int, beta: int, maximazing_player: bool, dep
 		through the depth.
 	"""
 	if depth == 0:
-		return board_evaluation(board)
+		return board_evaluation(board) * (1 if maximazing_player else -1)
 
 	best_move = -inf
 	for move in board.free_cells():
