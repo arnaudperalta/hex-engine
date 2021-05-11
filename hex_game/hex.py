@@ -22,6 +22,8 @@ class Board:
 
     LINE_LEN = 11
 
+    BOARD_LEN = 121
+
     def __init__(self):
         self.stack_moves = []
         self.board_state = [None] * 121

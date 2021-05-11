@@ -12,7 +12,6 @@ def get_best_move(board: Board, depth: int, side: bool) -> int:
     best_move_value = -inf
     if side == Board.RED:
         best_move_value = inf
-
     for move in board.free_cells():
         board.push(move)
         value = minimax_ab(board, -inf, inf, not side, depth - 1)

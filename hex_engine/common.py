@@ -22,22 +22,27 @@ def get_score(board: hex.Board, color: bool) -> int:
     # Initialisation
     visited = []
     values = []
-    for _ in range(len(hex.Board.CELLS)):
+    open_list = []
+    for _ in range(hex.Board.BOARD_LEN):
         values.append(inf)
-    values[hex.Board.A1] = 0
-
+    if color == hex.Board.RED:
+        for i in range(hex.Board.LINE_LEN):
+            values[i] = 0
+            open_list.append(i)
+    else:
+        for i in range(0, hex.Board.BOARD_LEN, hex.Board.LINE_LEN):
+            values[i] = 0
+            open_list.append(i)
     # Tant qu'il existe un sommet non visité
-    while len(visited) != len(hex.Board.CELLS):
+    while len(open_list) != 0:
         # On choisit un sommet pas encore visité minimal
-        curr = find_lowest(visited, values)
+        curr = open_list.pop(0)
         visited.append(curr)
-        if board.board_state[curr] == (not color):
-            continue
         # Pour chaque voisin de current hors de visited
         # et différent de la couleur opposée
         for h in hex.neighbors(curr):
             # print (curr, hex.neighbors(curr))
-            if h not in visited:
+            if h not in visited and board.board_state[h] != (not color):
                 weight = transition_value(
                     curr,
                     board.hex_color(curr),
@@ -47,7 +52,22 @@ def get_score(board: hex.Board, color: bool) -> int:
                 )
                 if values[h] > (values[curr] + weight) and weight != inf:
                     values[h] = values[curr] + weight
-    return values[hex.Board.K11]
+                    index = 0
+                    while (index < len(open_list)
+                            and values[open_list[index]] < values[h]):
+                        index = index + 1
+                    open_list.insert(index, h)
+    if color == hex.Board.RED:
+        res_values = []
+        for i in range(110, hex.Board.BOARD_LEN):
+            res_values.append(values[i])
+        res = min(res_values)
+    else:
+        res_values = []
+        for i in range(10, hex.Board.BOARD_LEN, hex.Board.LINE_LEN):
+            res_values.append(values[i])
+        res = min(res_values)
+    return res
 
 
 def find_lowest(visited, values):

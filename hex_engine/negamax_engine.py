@@ -42,7 +42,7 @@ def negamax_ab(board: Board, alpha: int, beta: int, maximazing_player: bool,
                                                depth - 1))
         board.pop()
         alpha = max(alpha, best_move)
-        if beta <= alpha:
+        if alpha >= beta:
             break
 
     if maximazing_player == Board.RED:
